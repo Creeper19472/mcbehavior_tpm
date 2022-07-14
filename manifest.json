@@ -11,7 +11,7 @@ manifent.json
         "description": "The peaceful mode pack",
         "name": "TPM Pack",
         "uuid": "02a4dc85-7b8b-46f3-9140-0481a0d44bdf",
-        "version": [ 0, 2, 21 ],
+        "version": [ 0, 2, 22 ],
         "min_engine_version": [ 1, 19, 0 ]
     },
     "modules": [

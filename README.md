@@ -1,5 +1,7 @@
 # Minecraft Behavior Pack: the True Peaceful Mode (TPM) README
 
+[![CI](https://github.com/Creeper19472/mcbehavior_tpm/actions/workflows/auto-release.yml/badge.svg)](https://github.com/Creeper19472/mcbehavior_tpm/actions/workflows/auto-release.yml)
+
 ## Introduction
 This is an Minecraft addon pack that provides a new gameplay
 named "the True Peaceful Mode". It allows the player to coexist
