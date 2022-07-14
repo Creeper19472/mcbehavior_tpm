@@ -1,0 +1,59 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Get Current Version
+        run: |
+          env
+          # MATCH_HEADER=$(grep '"header": {' manifest.json -A 6)
+          # MATCH_VERSION=$(echo $MATCH_HEADER | grep '"version"')
+          MATCH_VERSION=$(grep '"header": {' manifest.json -A 6 | sed -n "5,5p")
+          RELEASE_VERSION=$(echo $MATCH_VERSION | sed 's/^.*\[//g' | sed 's/\].*$//g' | sed 's/\,/\./g' | sed 's/\ //g')
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+  
+
+      - name: Create Release Packs
+        run: |
+          zip -r release_original.zip $GITHUB_WORKSPACE/
+          mv release_original.zip $RUNNER_WORKSPACE/tpm_v${{env.RELEASE_VERSION}}.mcaddon
+          
+      - name: Automatic Releases
+        # You may pin to the exact commit or the version.
+        # uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        with:
+          # GitHub secret token
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          # Git tag (for automatic releases)
+          automatic_release_tag: v${{env.RELEASE_VERSION}} # optional
+          # Should this release be marked as a draft?
+          draft: false # optional
+          # Should this release be marked as a pre-release?
+          prerelease: true # optional, default is true
+          # Release title (for automatic releases)
+          title: Release v${{env.RELEASE_VERSION}} # optional
+          # Assets to upload to the release
+          files: /home/runner/work/mcbehavior_tpm/tpm_v${{env.RELEASE_VERSION}}.mcaddon

@@ -1,0 +1,116 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:tnt",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+
+    "component_groups": {
+      "from_explosion": {
+        "minecraft:explode": {
+          "fuse_length": {
+            "range_min": 0.5,
+            "range_max": 2.0
+          },
+          "fuse_lit": true,
+          "power": 4,
+          "causes_fire": false
+        }
+      },
+      "creeper_tnt": {
+        "minecraft:projectile":{
+          "angle_offset": 30,
+          "catch_fire": false,
+          "crit_particle_on_hurt": false,
+          "destroy_on_hurt": false,
+          // "filter": ,
+          "fire_affected_by_griefing": false,
+          "gravity": 0.2,
+          // "hit_sound": ,
+          "homing": false,
+          "inertia": 0.3,
+          "is_dangerous": true,
+          "knockback": true,
+          "lightning": false,
+          "liquid_inertia": 0.6,
+          "multiple_targets": false,
+          "offset": [0, 1.7, 1],
+          "on_fire_time": 5,
+          // "particle": "ironcrack",
+          // "potion_effect": -1,
+          "archor": 1,
+          "power": 1.5,
+          "reflect_on_hurt": false,
+          "semi_random_diff_damage": false,
+          // "shoot_sound": ,
+          "shoot_target": true,
+          "should_bounce": true,
+          "splash_potion": false,
+          "splash_range": 4,
+          "uncertainty_base": 0,
+          "uncertainty_multiplier": 0
+        },
+        "minecraft:explode": {
+          "fuse_length": 1,
+          "fuse_lit": true,
+          "power": 4,
+          "breaks_blocks": false,
+          "causes_fire": false
+        }
+      }
+    },
+	
+    "components": {
+      "minecraft:type_family": {
+        "family": [ "tnt", "inanimate" ]
+      },
+      "minecraft:collision_box": {
+        "width": 0.98,
+        "height": 0.98
+      },
+
+      "minecraft:explode": {
+        "fuse_length": 4,
+        "fuse_lit": true,
+        "power": 4,
+        "causes_fire": false
+      },
+	    "minecraft:physics": {
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:conditional_bandwidth_optimization": {
+        "default_values": {
+          "max_optimized_distance": 80.0,
+          "max_dropped_ticks": 5,
+          "use_motion_prediction_hints": true
+        }
+      }
+    },
+    
+    "events": {
+      "from_explosion": {
+        "add": {
+          "component_groups": [
+            "from_explosion"
+          ]
+        }
+      },
+      "minecraft:entity_spawned": {
+        "sequence": [
+          {
+            "filters": {"test": "is_family", "subject": "other", "value": "creeper"},
+            "add": {
+              "component_groups" : [ "creeper_tnt" ] // 待新增
+            }
+          }
+        ]
+      }
+    }
+  }
+}

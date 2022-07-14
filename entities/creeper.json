@@ -1,0 +1,696 @@
+{
+  "format_version": "1.17.10", // "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:creeper",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      // 新增段
+      "minecraft:ranged_attack": {
+        "minecraft:behavior.ranged_attack": {
+          "priority": 0,
+          "attack_interval_min": 1.0,
+          "attack_interval_max": 2.5,
+          "attack_radius": 12.0,
+          "attack_radius_min": 8.0 
+        },
+        "minecraft:shooter": {
+          "def": "minecraft:tnt"
+        },
+        "minecraft:environment_sensor": {
+          "triggers": [
+            {
+              "filters": {
+                "test": "is_underwater",
+                "subject": "self",
+                "operator": "==",
+                "value": true
+              },
+              "event": "minecraft:melee_mode"
+            }/* ,
+            {
+              "filters": {
+                "test": "has_equipment",
+                "subject": "self",
+                "operator": "!=",
+                "value": "tnt"
+              },
+              "event": "minecraft:melee_mode"
+            } */
+          ]
+        }
+      },
+
+
+      "creeper_wild": {
+        // 信任定义段 - 防止误触苦力怕直接导致爆炸。
+        "minecraft:trusting": {
+          "probability": 0.33,
+          "trust_items": [ "gunpowder", "tnt" ],
+          "trust_event": {
+            "event": "minecraft:on_trust",
+            "target": "self"
+          }
+        },
+        "minecraft:behavior.tempt": {
+          "priority": 4,
+          "speed_multiplier": 1.0,
+          "within_radius": 16,
+          "items": [ "gunpowder", "tnt" ]
+        }
+        // 信任定义段结束
+      },
+      "creeper_trusting": {
+        "minecraft:persistent": {
+        },
+        "minecraft:trust": {},
+
+        "minecraft:interact": {
+          "interactions": [
+            { // 火药治愈
+              "on_interact": {
+                "filters": {
+                  "all_of": [
+                    { "test": "is_family", "subject": "other", "value": "player" },
+                    { "test": "has_equipment", "domain": "hand", "subject": "other", "value": "gunpowder" },
+                    { "test": "is_missing_health", "value": true } // 苦力怕需要非满血量
+                  ]
+                }
+            },
+            "use_item": true,
+            "health_amount": 5,
+            "play_sounds": "eat",
+            "interact_text": "action.interact.feed"
+            },
+            { // 由于是“覆盖”而非“增加”，所以需要重复定义一次
+              "on_interact": {
+                "filters": {
+                  "all_of": [
+                    { "test": "is_family", "subject": "other", "value": "player" },
+                    { "test": "has_equipment", "domain": "hand", "subject": "other", "value": "flint_and_steel" },
+                    { "test": "has_component", "operator": "!=", "value": "minecraft:explode" }
+                  ]
+                },
+              "event": "minecraft:start_exploding_forced",
+              "target": "self"
+              },
+              "hurt_item": 1,
+              "swing": true,
+              "play_sounds": "ignite",
+              "interact_text": "action.interact.creeper"
+            }
+          ]
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 2,
+          "entity_types": {
+            "filters": {
+              "any_of": [ // 不被信任就爆炸
+                {"test": "trusts", "subject": "other", "operator": "!=", "value": true}
+              ]
+            }
+          }
+        }
+      },
+      "gather_schedule_creeper": {
+        "minecraft:behavior.mingle": {
+          "priority": 5,
+          "speed_multiplier": 0.5,
+          "duration": 30,
+          "cooldown_time": 10,
+          "mingle_partner_type": "minecraft:creeper", // "monster", // "minecraft:villager_v2",
+          "mingle_distance": 2.0
+        }
+      },
+      "work_schedule_creeper": {
+        "minecraft:shareables": {
+          "items": [
+            {
+              "item": "minecraft:gunpowder",
+              "want_amount": 64,
+              "surplus_amount": 16,
+              "stored_in_inventory": true
+              // "craft_into": "minecraft:tnt"
+            },
+            {
+              "item": "minecraft:tnt",
+              "want_amount": 32,
+              "surplus_amount": 8,
+              "stored_in_inventory": true
+            }, 
+            {
+              "item": "minecraft:bread",
+              "want_amount": 3,
+              "surplus_amount": 6,
+              "stored_in_inventory": true
+            },
+            {
+              "item": "minecraft:carrot",
+              "want_amount": 60,
+              "surplus_amount": 24,
+              "stored_in_inventory": true
+            },
+            {
+              "item": "minecraft:potato",
+              "want_amount": 60,
+              "surplus_amount": 24,
+              "stored_in_inventory": true
+            },
+            {
+              "item": "minecraft:beetroot",
+              "want_amount": 60,
+              "surplus_amount": 24,
+              "stored_in_inventory": true
+            },
+            {
+              "item": "minecraft:wheat_seeds",
+              "want_amount": 64,
+              "surplus_amount": 64,
+              "stored_in_inventory": true,
+              "pickup_only": true
+            },
+            {
+              "item": "minecraft:beetroot_seeds",
+              "want_amount": 64,
+              "surplus_amount": 64,
+              "stored_in_inventory": true,
+              "pickup_only": true
+            },
+            {
+              "item": "minecraft:bone_meal",
+              "want_amount": 64,
+              "surplus_amount": 64,
+              "stored_in_inventory": true
+            },
+            {
+              "item": "minecraft:wheat",
+              "want_amount": 45,
+              "surplus_amount": 18,
+              "craft_into": "minecraft:bread",
+              "stored_in_inventory": true
+            }
+          ]
+        },
+        /* "minecraft:behavior.work_composter": {
+          "priority": 9,
+          "active_time": 250,
+          "speed_multiplier": 0.5,
+          "goal_cooldown": 200,
+          "can_work_in_rain": false,
+          "work_in_rain_tolerance": 100,
+          "on_arrival": {
+            "event": "minecraft:resupply_trades",
+            "target": "self"
+          }
+        }, */
+        "minecraft:behavior.harvest_farm_block": {
+          "priority": 7
+        },
+        "minecraft:behavior.fertilize_farm_block": {
+          "priority": 8
+        }
+      },
+      "nothing_to_do_schedule_creeper": { // 以后也许有
+      },
+      // END
+      "minecraft:exploding": {
+        "minecraft:explode": {
+          "fuse_length": 1.5,
+          "fuse_lit": true,
+          "power": 3,
+          "causes_fire": false,
+          "destroy_affected_by_griefing": true
+        }
+      },
+      "minecraft:charged_creeper": {
+        "minecraft:is_charged": {
+        }
+      },
+      "minecraft:charged_exploding": {
+        "minecraft:explode": {
+          "fuse_length": 1.5,
+          "fuse_lit": true,
+          "power": 6,
+          "causes_fire": false,
+          "destroy_affected_by_griefing": true
+        }
+      },
+      "minecraft:forced_exploding": {
+        "minecraft:target_nearby_sensor": {
+        },
+        "minecraft:explode": {
+          "fuse_length": 1.5,
+          "fuse_lit": true,
+          "power": 3,
+          "causes_fire": false,
+          "destroy_affected_by_griefing": true
+        },
+        "minecraft:on_target_escape": {
+        }
+      },
+      "minecraft:forced_charged_exploding": {
+        "minecraft:target_nearby_sensor": {
+        },
+        "minecraft:explode": {
+          "fuse_length": 1.5,
+          "fuse_lit": true,
+          "power": 6,
+          "causes_fire": false,
+          "destroy_affected_by_griefing": true
+        },
+        "minecraft:on_target_escape": {
+        }
+      }
+    },
+
+    "components": {
+      "minecraft:is_hidden_when_invisible": {
+      },
+      "minecraft:experience_reward": {
+        "on_death": "query.last_hit_by_player ? 5 : 0"
+      },
+      "minecraft:type_family": {
+        "family": [ "creeper", "monster", "mob" ]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:nameable": {
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:movement": {
+        "value": 0.2
+      },
+      "minecraft:navigation.walk": {
+      "can_path_over_water": true,
+      "can_pass_doors": true,
+      "can_open_doors": true
+      },
+      "minecraft:movement.basic": {
+
+      },
+      "minecraft:annotation.open_door": {
+      },
+      "minecraft:jump.static": {
+      },
+      "minecraft:can_climb": {
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/entities/creeper.json"
+      },
+      // 环境段 - 决定苦力怕可否使用近战和远程攻击。
+      "minecraft:environment_sensor": {
+        "triggers": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "in_water",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": false
+                },
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "any",
+                  "operator": "equals", // ==
+                  "value": "tnt"
+                }
+              ]
+            },
+            "event": "minecraft:ranged_mode"
+          }
+        ]
+      },
+
+      // 物品新增段 - 用于赋予苦力怕物品栏和拾取物品的设定。
+      "minecraft:inventory": {
+        "inventory_size": 8,
+        "private": false
+      },
+      "minecraft:shareables": {
+        "items": [
+          {
+            "item": "minecraft:gunpowder",
+            "want_amount": 64,
+            "surplus_amount": 16,
+            "stored_in_inventory": true
+            // "craft_into": "minecraft:tnt"
+          },
+          {
+            "item": "minecraft:tnt",
+            "want_amount": 32,
+            "surplus_amount": 8,
+            "stored_in_inventory": true
+          } // 既能种地又能捡火药的苦力怕 // 种地放在了计划任务里
+        ]
+      },
+      // 段落结束
+
+      "minecraft:health": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": { "test": "in_lava", "subject": "self", "operator": "==", "value": true },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "on_damage": {
+            "filters": { "test": "is_family", "subject": "other", "value": "lightning"
+            },
+            "event": "minecraft:become_charged"
+          },
+          "deals_damage": false
+        }
+      },
+      "minecraft:target_nearby_sensor": {
+        "inside_range": 2.5,
+        "outside_range": 6.0,
+        "must_see": true,
+        "on_inside_range": {
+          "event": "minecraft:start_exploding",
+          "target": "self"
+        },
+        "on_outside_range": {
+          "event": "minecraft:stop_exploding",
+          "target": "self"
+        },
+        "on_vision_lost_inside_range": {
+            "event": "minecraft:stop_exploding",
+            "target": "self"
+        }
+      },
+      "minecraft:interact": {
+        "interactions": [
+          {
+            "on_interact": {
+              "filters": {
+                "all_of": [
+                  { "test": "is_family", "subject": "other", "value": "player" },
+                  { "test": "has_equipment", "domain": "hand", "subject": "other", "value": "flint_and_steel" },
+                  { "test": "has_component", "operator": "!=", "value": "minecraft:explode" }
+                ]
+              },
+            "event": "minecraft:start_exploding_forced",
+            "target": "self"
+            },
+            "hurt_item": 1,
+            "swing": true,
+            "play_sounds": "ignite",
+            "interact_text": "action.interact.creeper"
+          }
+        ]
+      },
+
+      "minecraft:despawn": {
+        "despawn_from_distance": {}
+      },
+      
+      // 计划任务段
+      "minecraft:scheduler":{
+        "min_delay_secs": 0,
+        "max_delay_secs": 10,
+        "scheduled_events": [
+          {
+            "filters": {
+              "all_of": [
+                { "test": "hourly_clock_time", "operator": ">=", "value": 0 },
+                { "test": "hourly_clock_time", "operator": "<", "value": 8000 }
+              ]
+            },
+            "event": "tpm:schedule_nothing_to_do_creeper"
+          },
+          {
+            "filters": {
+              "all_of": [
+                { "test": "hourly_clock_time", "operator": ">=", "value": 8000 },
+                { "test": "hourly_clock_time", "operator": "<", "value": 10000}
+              ]
+            },
+            "event": "tpm:schedule_gather_monster"
+          },
+          {
+            "filters": {
+              "all_of": [
+                { "test": "hourly_clock_time", "operator": ">=", "value": 11000 },
+                { "test": "hourly_clock_time", "operator": "<", "value": 12000 }
+              ]
+            },
+            "event": "tpm:schedule_work_creeper"
+          },
+          {
+            "filters": {
+              "all_of": [
+                { "test": "hourly_clock_time", "operator": ">=", "value": 11000 },
+                { "test": "hourly_clock_time", "operator": "<", "value": 24000 }
+              ]
+            },
+            "event": "tpm:schedule_nothing_to_do_creeper"
+          }
+        ]
+      },
+      // 段落结束
+
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:behavior.swell": {
+        "start_distance": 2.5,
+        "stop_distance": 6.0,
+        "priority": 2
+      },
+      "minecraft:behavior.avoid_mob_type": {
+        "priority": 3,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                { "test" :  "is_family", "subject" : "other", "value" :  "ocelot"},
+                { "test" :  "is_family", "subject" : "other", "value" :  "cat"}
+              ]
+            },
+            "max_dist": 6,
+            "sprint_speed_multiplier": 1.2
+          }
+        ]
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 4,
+        "speed_multiplier": 1.25,
+        "track_target": false,
+        "reach_multiplier":  0.0 // this prevents creepers from ocasionally performing melee attacks while using this goal to chase
+      },
+      "minecraft:attack": {
+        "damage": 3
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 7,
+        "look_distance": 8
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 7
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 1,
+        "must_see": true,
+        "must_see_forget_duration": 3.0,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                { "test": "is_family", "subject": "other", "value": "warden" },
+                { "test": "is_family", "subject": "other", "value": "snowgolem" }
+                // { "test": "is_family", "subject": "other", "value": "" }
+
+              ]
+            },
+            "max_dist": 16
+          }
+        ]
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 2
+      },
+      "minecraft:behavior.pickup_items": {
+        "priority": 0,
+        "max_dist": 5,
+        "goal_radius": 2,
+        "speed_multiplier": 1.0,
+        "can_pickup_to_hand_or_equipment": false
+      },
+      "minecraft:break_blocks": { // 让苦力怕能够破坏 TNT 方块
+        "breakable_blocks": [ "tnt" ]
+      },
+      "minecraft:physics": {
+      },
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:on_target_escape": {
+        "event": "minecraft:stop_exploding",
+        "target": "self"
+      },
+      "minecraft:conditional_bandwidth_optimization": {
+      }
+    },
+
+    "events": {
+      "minecraft:start_exploding_forced": {
+        "sequence": [
+          {
+            "filters": {
+              "test": "has_component",
+              "operator": "!=",
+              "value": "minecraft:is_charged"
+            },
+            "add": {
+              "component_groups": [
+                "minecraft:forced_exploding"
+              ]
+            }
+          },
+          {
+            "filters": {
+              "test": "has_component",
+              "value": "minecraft:is_charged"
+            },
+            "add": {
+              "component_groups": [
+                "minecraft:forced_charged_exploding"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:start_exploding": {
+        "sequence": [
+          {
+            "filters": {
+              "test": "has_component",
+              "operator": "!=",
+              "value": "minecraft:is_charged"
+            },
+            "add": {
+              "component_groups": [
+                "minecraft:exploding"
+              ]
+            }
+          },
+          {
+            "filters": {
+              "test": "has_component",
+              "value": "minecraft:is_charged"
+            },
+            "add": {
+              "component_groups": [
+                "minecraft:charged_exploding"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:stop_exploding": {
+        "remove": {
+          "component_groups": [
+            "minecraft:exploding"
+          ]
+        }
+      },
+      "minecraft:become_charged": {
+        "remove": {
+          "component_groups": [
+            "minecraft:exploding"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "minecraft:charged_creeper"
+          ]
+        }
+      },
+      // 新增规则
+      "minecraft:entity_spawned": {
+        "sequence": [
+          {
+            "add": { "component_groups": [ "creeper_wild" ] }
+          }/* ,
+          {
+            "filters": {
+              "test": "has_equipment",
+              "operator": "!=",
+              "value": "tnt"
+            },
+            "remove": { "component_groups": [ "minecraft:ranged_attack" ] }
+          } */
+        ]
+      },
+      "minecraft:on_trust": {
+        "sequence": [
+          {
+            // "filters": { "test": "has_component", "operator": "!=", "value": "minecraft:" },
+            "remove": { "component_groups": [ "creeper_wild" ] },
+            "add": { "component_groups": [ "creeper_trusting" ] }
+          }
+        ]
+      },
+      "tpm:schedule_gather_monster": {
+        "sequence": [
+          {
+            "remove": { "component_groups": [ "work_schedule_creeper" ] },
+            "add": { "component_groups": [ "gather_schedule_creeper" ] } // 事件命名任务计划在后，组件组命名任务计划在前
+          }
+        ]
+      },
+      "tpm:schedule_work_creeper": {
+        "sequence": [
+          {
+            "remove": { "component_groups": [ "gather_schedule_creeper" ] },
+            "add": { "component_groups": [ "work_schedule_creeper" ] }
+          }
+        ]
+      },
+      "tpm:schedule_nothing_to_do_creeper": {
+        "sequence": [
+          {
+            "remove": { "component_groups": [ "gather_schedule_creeper", "work_schedule_creeper" ] },
+            "add": { "component_groups": [ "nothing_to_do_schedule_creeper" ] }
+          }
+        ]
+      },
+      "minecraft:melee_mode": {
+        "sequence": [
+          {
+            "remove": { "component_groups": [ "minecraft:ranged_attack" ] }
+          }
+        ]
+      },
+      "minecraft:ranged_mode": {
+        "sequence": [
+          {
+            "add": { "component_groups": [ "minecraft:ranged_attack" ] }
+          }
+        ]
+      }
+    }
+  }
+}

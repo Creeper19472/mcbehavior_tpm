@@ -1,0 +1,32 @@
+/* 
+manifent.json
+真正的和平模式（the True Peaceful Mode, TPM)
+
+有关《真正的和平模式》的更新说明，请参考《发行注记》。
+*/
+
+{
+    "format_version": 2,
+    "header": {
+        "description": "The peaceful mode pack",
+        "name": "TPM Pack",
+        "uuid": "02a4dc85-7b8b-46f3-9140-0481a0d44bdf",
+        "version": [ 0, 2, 21 ],
+        "min_engine_version": [ 1, 19, 0 ]
+    },
+    "modules": [
+        {
+            "description": "The peaceful mode behavior pack",
+            "type": "data",
+            "uuid": "83a2566f-88df-4e9c-9946-bba10c89c5fe",
+            "version": [0, 0, 2]
+        }
+    ],
+    "metadata": {
+        "authors": [
+            "Creeper19472"
+        ],
+        "license": "MIT",
+        "url": "https://crpteam.club"
+    }
+}
