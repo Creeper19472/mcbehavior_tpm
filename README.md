@@ -30,5 +30,15 @@ it, but how can you bear it)
 Just download the source code and install it as usual. 
 
 **Or** download the .mcaddon pack and double-click it... Don't 
-worry, it's simple for you to build it, and we'll also provide it
-in the future.
+worry, it's simple for you to build it, and we have attached 
+the click-to-run package files in the releases.
+
+## Development
+Because this add-on is still in the early stages of development, 
+a lot of content has yet to be implemented. Refer to RELEASE_NOTES.md
+for each update description.
+
+If you want to participate in our development, you are welcome to 
+file an issue with us. If you have the ability, you can also directly 
+fork this repository and submit a pull request. We welcome you to 
+submit our eagerly awaited code.
