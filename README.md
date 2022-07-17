@@ -45,3 +45,12 @@ If you want to participate in our development, you are welcome to
 file an issue with us. If you have the ability, you can also directly 
 fork this repository and submit a pull request. We welcome you to 
 submit our eagerly awaited code.
+
+## Reprint
+If you wish to reprint this project to other communities, you need 
+to inform us in advance. 
+
+Please note that we **DO NOT** allow you to repost this project to 
+klpbbs.com. After trying it, we found that it is not friendly to 
+publish resources on it. You can file an issue to learn more about 
+this issue. Thanks.
