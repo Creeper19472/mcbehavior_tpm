@@ -8,7 +8,10 @@ named "the True Peaceful Mode". It allows the player to coexist
 peacefully with some monsters, and from this, a new way of 
 playing is derived.
 
-**Note:** Still in development.
+**Note:** Still in development. If you are from klpbbs.com, you 
+need to be aware that we are no longer syncing development progress 
+on it. Please keep the link to this repository to keep up with the 
+latest version.
 
 ## Feature
 Some of the things that have been developed or will be added in

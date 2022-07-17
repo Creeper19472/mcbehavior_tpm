@@ -107,14 +107,17 @@
         "minecraft:behavior.hurt_by_target": {
           "priority": 2,
           "entity_types": {
-            "filters": {
-              "any_of": [ // 不被信任就爆炸
-                {"test": "trusts", "subject": "other", "operator": "!=", "value": true}
-              ]
-            }
+            "filters": { // 如果可能，日后实现的应当是谁受实体信任则不攻击谁
+              "test": "is_family",
+              "subject": "other",
+              "operator": "!=",
+              "value": "player"
+            },
+            "max_dist": 64
           }
         }
       },
+      
       "gather_schedule_creeper": {
         "minecraft:behavior.mingle": {
           "priority": 5,
